@@ -38,7 +38,7 @@ export const buildQuery = async (): Promise<string> => {
   LIMIT
     1;
   `;
-  console.log(`query: ${JSON.stringify(query)}`);
+  console.info(`query: ${JSON.stringify(query)}`);
   return query;
 };
 
@@ -46,7 +46,7 @@ export const getQueryResultFromAthena = async (
   query: string,
 ): Promise<GetQueryResultsCommandOutput> => {
   const queryExecutionId = await executeQuery(query);
-  await waitExecuteQuery(queryExecutionId);
+  await waitQueryResult(queryExecutionId);
   const response = getQueryResults(queryExecutionId);
   return response;
 };
@@ -56,7 +56,8 @@ export const showQueryResult = async (
 ) => {
   const label = response.ResultSet!.Rows![0].Data![0].VarCharValue;
   const value = response.ResultSet!.Rows![1].Data![0].VarCharValue;
-  console.log(`label:${label}, value:${value}`);
+  console.info(`label: ${label}`);
+  console.info(`value: ${value}`);
 };
 
 const executeQuery = async (query: string): Promise<string> => {
@@ -78,11 +79,11 @@ const executeQuery = async (query: string): Promise<string> => {
   return QueryExecutionId;
 };
 
-const waitExecuteQuery = async (queryExecutionId: string) => {
+const waitQueryResult = async (queryExecutionId: string) => {
   // Poll the result until the execution finishs
   let queryExecutionState: QueryExecutionState = QueryExecutionState.RUNNING;
   while (queryExecutionState === QueryExecutionState.RUNNING) {
-    console.log(`Polling query execution...`);
+    console.info(`polling query execution...`);
     // wait for 1 second
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -119,6 +120,6 @@ const getQueryResults = async (
   if (response?.ResultSet?.Rows === undefined) {
     throw new Error('ResultSet is undefined.');
   }
-  console.log(`ResultSet: ${JSON.stringify(response)}`);
+  console.info(`response from Athena: ${JSON.stringify(response)}`);
   return response;
 };
