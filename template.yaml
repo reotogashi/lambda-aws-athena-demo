@@ -12,12 +12,19 @@ Globals:
     MemorySize: 128
 
 Resources:
-  HelloWorldFunction:
+  Function:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: ./
       Handler: index.handler
       Runtime: nodejs18.x
+      Environment:
+        Variables:
+          DATABASE_NAME: TODO_DATABASE_NAME # Ex: database
+          TABLE_NAME: TODO_DATABASE_NAME # Ex: table
+          OUTPUT_LOCATION: TODO_OUTPUT_LOCATION # Ex s3://bucket-name/
+          S3_URL_FOR_QUERY: TODO_S3_URL_FOR_QUERY # Ex: s3://bucket-name/your.json
+          QUERY_DATE: TODO_QUERY_DATE # Ex: 2023-08-08
       Architectures:
         - x86_64
     Metadata: # Manage esbuild properties

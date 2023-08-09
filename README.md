@@ -17,7 +17,13 @@ $ npm -v
 9.6.7
 ```
 
-## 1. How to run cdk locally
+- Database and table are already created in Athena
+
+## 1. How to run sam locally
 
 - Run `npm install`
+- Add Environment Variables in `template.yaml`
 - Run `npm run sam-local`
+
+## Reference
+- https://dev.classmethod.jp/articles/amazon-athena-pagination-typescript/

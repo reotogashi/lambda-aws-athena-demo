@@ -1,30 +1,12 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { buildQuery, getQueryResultFromAthena } from './src/services/athena';
 
-/**
- *
- * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
- * @param {Object} event - API Gateway Lambda Proxy Input Format
- *
- * Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
- * @returns {Object} object - API Gateway Lambda Proxy Output Format
- *
- */
-
-export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    try {
-        return {
-            statusCode: 200,
-            body: JSON.stringify({
-                message: 'hello world',
-            }),
-        };
-    } catch (err) {
-        console.log(err);
-        return {
-            statusCode: 500,
-            body: JSON.stringify({
-                message: 'some error happened',
-            }),
-        };
-    }
+export const handler = async (event: any): Promise<string> => {
+  try {
+    const query = await buildQuery();
+    const resultSet = await getQueryResultFromAthena(query);
+    return 'Succeeded';
+  } catch (err) {
+    console.log(JSON.stringify(err));
+    return 'Failed';
+  }
 };

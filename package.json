@@ -7,7 +7,7 @@
   "author": "SAM CLI",
   "license": "MIT",
   "scripts": {
-    "lint": "eslint '*.ts' --quiet --fix",
+    "lint": "eslint \"**/*.ts\" --quiet --fix",
     "sam-local": "sam build & sam local invoke"
   },
   "devDependencies": {
@@ -25,5 +25,8 @@
     "prettier": "^2.5.1",
     "ts-node": "^10.9.1",
     "typescript": "^4.8.4"
+  },
+  "dependencies": {
+    "@aws-sdk/client-athena": "^3.387.0"
   }
 }
