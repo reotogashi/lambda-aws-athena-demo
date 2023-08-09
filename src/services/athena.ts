@@ -4,6 +4,7 @@ import {
   GetQueryResultsCommand,
   StartQueryExecutionCommand,
   QueryExecutionState,
+  GetQueryResultsCommandOutput,
 } from '@aws-sdk/client-athena';
 
 import {
@@ -11,12 +12,12 @@ import {
   TABLE_NAME,
   S3_URL_FOR_OUTPUT_LOCATION,
   S3_URL_FOR_QUERY,
-  QUERY_DATE
+  QUERY_DATE,
 } from '../constants';
 const athena = new AthenaClient();
 
 export const buildQuery = async (): Promise<string> => {
-  // Update query if needed 
+  // Update query if needed
   const query = `
   SELECT
     COUNT(DISTINCT user_id) AS total_new_users
@@ -41,11 +42,21 @@ export const buildQuery = async (): Promise<string> => {
   return query;
 };
 
-export const getQueryResultFromAthena = async (query: string): Promise<any> => {
+export const getQueryResultFromAthena = async (
+  query: string,
+): Promise<GetQueryResultsCommandOutput> => {
   const queryExecutionId = await executeQuery(query);
   await waitExecuteQuery(queryExecutionId);
-  const resultSet = getQueryResults(queryExecutionId);
-  return resultSet;
+  const response = getQueryResults(queryExecutionId);
+  return response;
+};
+
+export const showQueryResult = async (
+  response: GetQueryResultsCommandOutput,
+) => {
+  const label = response.ResultSet!.Rows![0].Data![0].VarCharValue;
+  const value = response.ResultSet!.Rows![1].Data![0].VarCharValue;
+  console.log(`label:${label}, value:${value}`);
 };
 
 const executeQuery = async (query: string): Promise<string> => {
@@ -71,7 +82,7 @@ const waitExecuteQuery = async (queryExecutionId: string) => {
   // Poll the result until the execution finishs
   let queryExecutionState: QueryExecutionState = QueryExecutionState.RUNNING;
   while (queryExecutionState === QueryExecutionState.RUNNING) {
-    console.log(`Polling query execution...`)
+    console.log(`Polling query execution...`);
     // wait for 1 second
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -96,16 +107,18 @@ const waitExecuteQuery = async (queryExecutionId: string) => {
   }
 };
 
-const getQueryResults = async (queryExecutionId: string): Promise<any> => {
-  const { ResultSet } = await athena.send(
+const getQueryResults = async (
+  queryExecutionId: string,
+): Promise<GetQueryResultsCommandOutput> => {
+  const response: GetQueryResultsCommandOutput = await athena.send(
     new GetQueryResultsCommand({
       QueryExecutionId: queryExecutionId,
     }),
   );
 
-  if (ResultSet?.Rows === undefined) {
+  if (response?.ResultSet?.Rows === undefined) {
     throw new Error('ResultSet is undefined.');
   }
-  console.log(`ResultSet: ${JSON.stringify(ResultSet)}`);
-  return ResultSet;
+  console.log(`ResultSet: ${JSON.stringify(response)}`);
+  return response;
 };
