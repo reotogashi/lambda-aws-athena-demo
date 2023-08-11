@@ -25,5 +25,10 @@ $ npm -v
 - Add Environment Variables in `template.yaml`
 - Run `npm run sam-local`
 
+## 2. How to deploy the SAM application to AWS
+
+- Run `npm run sam-deploy`
+  - If you cannot create a S3 bucket speciifed in `samconfig.toml` because the bucket already exists, please create a different S3 bucket and specify in the toml file
+
 ## Reference
 - https://dev.classmethod.jp/articles/amazon-athena-pagination-typescript/

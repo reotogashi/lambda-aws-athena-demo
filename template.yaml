@@ -21,12 +21,13 @@ Resources:
       Environment:
         Variables:
           DATABASE_NAME: TODO_DATABASE_NAME # Ex: database
-          TABLE_NAME: TODO_DATABASE_NAME # Ex: table
-          OUTPUT_LOCATION: TODO_OUTPUT_LOCATION # Ex s3://bucket-name/
+          TABLE_NAME: TODO_TABLE_NAME # Ex: table
+          S3_URL_FOR_OUTPUT_LOCATION: TODO_S3_URL_OUTPUT_LOCATION # Ex s3://bucket-name/
           S3_URL_FOR_QUERY: TODO_S3_URL_FOR_QUERY # Ex: s3://bucket-name/your.json
           QUERY_DATE: TODO_QUERY_DATE # Ex: 2023-08-08
       Architectures:
         - x86_64
+      Role: !GetAtt FunctionIamRole.Arn
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
@@ -35,3 +36,39 @@ Resources:
         Sourcemap: true
         EntryPoints:
           - index.ts
+  FunctionIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: lambda-aws-athena-demo-role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: lambda-aws-athena-demo-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - athena:StartQueryExecution
+                  - athena:GetQueryExecution
+                  - athena:GetQueryResults
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - glue:GetTable
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - s3:GetBucketLocation
+                  - s3:GetObject
+                  - s3:ListBucket
+                  - s3:ListBucketMultipartUploads
+                  - s3:ListMultipartUploadParts
+                  - s3:AbortMultipartUpload
+                  - s3:PutObject
+                Resource: "*"
