@@ -1,5 +1,8 @@
 # lambda-aws-athena-demo
 
+- This is a sample SAM application to query by Athena.
+- Initial code is prepared by `sam init`.
+
 ## 0. Prerequisite
 
 ```
